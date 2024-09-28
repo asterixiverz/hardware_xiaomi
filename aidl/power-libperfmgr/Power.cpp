@@ -25,6 +25,7 @@
 #include <android-base/strings.h>
 #include <perfmgr/HintManager.h>
 #include <utils/Log.h>
+#define TARGET_TAP_TO_WAKE_NODE "/proc/tp_gesture"
 
 #include <mutex>
 
@@ -90,9 +91,9 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
     }
 #endif
     switch (type) {
-#ifdef TAP_TO_WAKE_NODE
+#ifdef TARGET_TAP_TO_WAKE_NODE
         case Mode::DOUBLE_TAP_TO_WAKE:
-            ::android::base::WriteStringToFile(enabled ? "1" : "0", TAP_TO_WAKE_NODE, true);
+            ::android::base::WriteStringToFile(enabled ? "1" : "0", TARGET_TAP_TO_WAKE_NODE, true);
             break;
 #endif
         case Mode::SUSTAINED_PERFORMANCE:
@@ -106,7 +107,7 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
                 break;
             }
             [[fallthrough]];
-#ifndef TAP_TO_WAKE_NODE
+#ifndef TARGET_TAP_TO_WAKE_NODE
         case Mode::DOUBLE_TAP_TO_WAKE:
             [[fallthrough]];
 #endif
@@ -142,7 +143,7 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool *_aidl_return) {
 #endif
 
     bool supported = HintManager::GetInstance()->IsHintSupported(toString(type));
-#ifdef TAP_TO_WAKE_NODE
+#ifdef TARGET_TAP_TO_WAKE_NODE
     if (type == Mode::DOUBLE_TAP_TO_WAKE) {
         supported = true;
     }
